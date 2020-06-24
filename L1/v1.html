@@ -63,6 +63,11 @@
                 min-height: 400px;
             }
         }
+
+        td,
+        th {
+            border: 1px solid #bdbdbd;
+        }
     </style>
 </head>
 
@@ -77,44 +82,73 @@
     <div class="w3-content w3-container w3-padding-64" id="app">
         <h3 class="w3-center">內文</h3>
         <p class="w3-center"><em>政府API</em></p>
-        <div v-for="item in json">
-            <div class="w3-card w3-container w3-margin w3-padding-48 w3-center">
-                <p>{{item.name}}</p>
+        <div class="w3-bar " style="color: #6f6f6f;">
+            <button class="w3-bar-item w3-button tablink w3-gray" onclick="openTab(event,'parkInfo')">停車場資訊</button>
+            <button class="w3-bar-item w3-button tablink" onclick="openTab(event,'bus')">新北市公共自行車租賃系統(YouBike)</button>
+        </div>
+        <div id="parkInfo" class="tab">
+            <div v-for="item in json">
+                <div class="w3-card w3-container w3-margin w3-padding-48 w3-center">
+                    <p>{{item.name}}</p>
 
-                <table class="w3-table-all w3-hoverable w3-small">
-                    <tr>
-                        <th>地區</th>
-                        <th>說明</th>
-                        <th>地址</th>
-                    </tr>
-                    <tr>
-                        <td>{{item.area}}</td>
-                        <td>{{item.summary}}</td>
-                        <td>{{item.address}}</td>
-                    </tr>
-                    <tr>
-                        <th>電話</th>
-                        <th>收費方式</th>
-                        <th>服務時間</th>
-                    </tr>
-                    <tr>
-                        <td>{{item.tel}}</td>
-                        <td>{{item.payEx}}</td>
-                        <td>{{item.serviceTime}}</td>
-                    </tr>
-                    <tr>
-                        <th>汽車數量</th>
-                        <th>機車數量</th>
-                        <th></th>
-                    </tr>
-                    <tr>
-                        <td>{{item.totalCar}}</td>
-                        <td>{{item.totalMotor}}</td>
-                        <td></td>
-                    </tr>
-                </table>
-
+                    <table class="w3-table-all w3-hoverable w3-small">
+                        <tr>
+                            <th>地區</th>
+                            <th>說明</th>
+                            <th>地址</th>
+                        </tr>
+                        <tr>
+                            <td>{{item.area}}</td>
+                            <td>{{item.summary}}</td>
+                            <td>{{item.address}}</td>
+                        </tr>
+                        <tr>
+                            <th>電話</th>
+                            <th>收費方式</th>
+                            <th>服務時間</th>
+                        </tr>
+                        <tr>
+                            <td>{{item.tel}}</td>
+                            <td>{{item.payEx}}</td>
+                            <td>{{item.serviceTime}}</td>
+                        </tr>
+                        <tr>
+                            <th>汽車數量</th>
+                            <th>機車數量</th>
+                            <th></th>
+                        </tr>
+                        <tr>
+                            <td>{{item.totalCar}}</td>
+                            <td>{{item.totalMotor}}</td>
+                            <td></td>
+                        </tr>
+                    </table>
+                </div>
             </div>
+        </div>
+        <div id="bus" class="tab " style="display:none;width: 95%;">
+            <input class="w3-input w3-border w3-padding w3-margin" type="text" placeholder="請輸入查詢的站名" id="myInput"
+                onkeyup="youbikeSearch(event)">
+            <table class="w3-table-all w3-margin w3-card" id="myTable">
+                <tr>
+                    <th>編號</th>
+                    <th>地區</th>
+                    <th>站名</th>
+                    <th style="width: 30%;">地址</th>
+                    <th>總共</th>
+                    <th>剩餘</th>
+                    <th>最後時間</th>
+                </tr>
+                <tr v-for="item in json1">
+                    <td>{{item.sno}}</td>
+                    <td>{{item.sarea}}</td>
+                    <td>{{item.sna}}</td>
+                    <td>{{item.ar}}</td>
+                    <td>{{item.tot}}</td>
+                    <td>{{item.sbi}}</td>
+                    <td>{{item.mday}}</td>
+                </tr>
+            </table>
         </div>
     </div>
 </body>
@@ -138,18 +172,56 @@
     var app2 = new Vue({
         el: '#app',
         data: {
-            json: null
+            json: null,
+            json1: 123
         },
         created: function () {
-            const proxyurl = "https://cors-anywhere.herokuapp.com/";
-            fetch(proxyurl + "https://data.ntpc.gov.tw/api/datasets/B1464EF0-9C7C-4A6F-ABF7-6BDF32847E68/json?page=0&size=100")
+            const proxyurl = "https://cors-anywhere.herokuapp.com/";// 透過proxy
+            fetch(proxyurl + "https://data.ntpc.gov.tw/api/datasets/B1464EF0-9C7C-4A6F-ABF7-6BDF32847E68/json?page=0&size=100")// 停車場
                 .then(r => r.json())
                 .then(json => {
                     this.json = json;
                 });
+            fetch(proxyurl + "https://data.ntpc.gov.tw/api/datasets/71CD1490-A2DF-4198-BEF1-318479775E8A/json?page=0&size=100")// YOUBIKE資訊
+                .then(r => r.json())
+                .then(json => {
+                    this.json1 = json;
+                });
         }
     })
 
+    function openTab(evt, id) {
+        var i, x, tablinks;
+        var x = document.getElementsByClassName("tab");
+        for (i = 0; i < x.length; i++) {
+            x[i].style.display = "none";
+        }
+        tablinks = document.getElementsByClassName("tablink");
+        for (i = 0; i < x.length; i++) {
+            tablinks[i].className = tablinks[i].className.replace(" w3-gray", "");
+        }
+        document.getElementById(id).style.display = "block";
+        evt.currentTarget.className += " w3-gray";
+    }
 
-
+    function youbikeSearch(e) {
+        if (e.keyCode === 13) {
+            var input, filter, table, tr, td, i;
+            input = document.getElementById("myInput");
+            filter = input.value.toUpperCase();
+            table = document.getElementById("myTable");
+            tr = table.getElementsByTagName("tr");
+            for (i = 0; i < tr.length; i++) {
+                td = tr[i].getElementsByTagName("td")[2];
+                if (td) {
+                    txtValue = td.textContent || td.innerText;
+                    if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                        tr[i].style.display = "";
+                    } else {
+                        tr[i].style.display = "none";
+                    }
+                }
+            }
+        }
+    }
 </script>
