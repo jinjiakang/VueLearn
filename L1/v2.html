@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.11/vue.js'></script>
+    <link rel='stylesheet'
+        href='https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.0.0-alpha1/css/bootstrap.min.css' />
+    <title>Document</title>
+</head>
+
+<body>
+    <div id="app" class="container mt-5">
+        <h1 class="title">
+            {{title}}
+        </h1>
+
+        <div class="content">
+            {{content}}
+        </div>
+
+        <ol>
+            <li v-for="todo in todos">
+                {{ todo.text }}
+            </li>
+        </ol>
+
+        <div>
+            <p>{{index}}</p>
+            <button @click="addIndex">+1</button>
+            <button @click="resetIndex">0</button>
+            <button @click="removeIndex">-1</button>
+            <input v-model.number="index">
+            <h5>{{now}}</h5>
+        </div>
+    </div>
+</body>
+
+<script>
+    let data = {
+        title: '123',
+        content: '首頁',
+        flag: true,
+        todos: [
+            { text: 'Learn JavaScript' },
+            { text: 'Learn Vue' },
+            { text: 'Build something awesome' }
+        ],
+        index: 0
+    }
+
+    let vue = new Vue({
+        el: '#app',
+        data: data,
+        methods: {
+            addIndex: function () {
+                this.index++
+            },
+            resetIndex: function () {
+                this.index = 0
+            },
+            removeIndex: function () {
+                this.index += -1
+            }
+        },
+        computed: {
+            now: function () {
+                return Date.now()
+            }
+        }
+    })
+
+</script>
+
+</html>
